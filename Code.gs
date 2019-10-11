@@ -281,6 +281,34 @@ function takeRoom(col, row, duration, student) {
   }
 }
 
+function findRoomCol(roomName) {
+  var room = SpreadsheetApp.getActive().getSheetByName('Room');
+  var roomArray = room.getRange(1,1,1,room.getLastColumn()).getValues();
+  return roomArray[0].indexOf(roomName);
+}
+
+function arrangeClass(date) {
+  var day = dateToDay(date);
+  Logger.log(day);
+  var class = SpreadsheetApp.getActive().getSheetByName('Class');
+  var firstCol = class.getRange(1,1,class.getLastRow(),1).getValues().map(function(e){return e[0];});
+  var row = firstCol.indexOf(day)+1;
+  Logger.log("Row #"+row);
+  var numClass = class.getRange(row,2).getValue();
+  Logger.log("numClass: "+numClass);
+  var className, time, roomName, teacher, schedule, roomCol;
+  for (var i=0; i<numClass; i++) {
+    className = class.getRange(row+1,2+i).getValue();
+    time = class.getRange(row+2,2+i).getValue();
+    roomName = class.getRange(row+3,2+i).getValue();
+    Logger.log(className+time+roomName);
+    schedule = parseTime(time);
+    roomCol = findRoomCol(roomName);
+    Logger.log(roomCol);
+    takeRoom(roomCol,schedule[0],schedule[1],className);
+  }
+}
+
 function roomArrange(sheet,counseling) {
   var room = SpreadsheetApp.getActive().getSheetByName('Room');
   var count = sheet.getLastRow()-1;
@@ -330,32 +358,10 @@ function finishAgenda() {
   agenda.getRange(4,1,agenda.getMaxRows()-4,8).clear();
   agenda.getRange(4,1,agenda.getMaxRows()-4,8).setNumberFormat("@");
   var date = agenda.getRange(1,1).getValue();
-  //var i, j, time, startTime, endTime, scheduleRow, duration, student, roomFound, available;
+  //Arrange Classes
+  arrangeClass(date);
   //Arrange CC rooms
   roomArrange(cc,true);
-//  var numCC = cc.getLastRow()-1;
-//  if (numCC != 0) {
-//    agenda.getRange(4,5,numCC,3).setValues(cc.getRange(2,4,numCC,3).getValues());
-//    //put all CC into Room tag
-//    for (i=0; i<numCC; i++) {
-//      roomFound = false;
-//      student = agenda.getRange(4+i,5).getValue();
-//      time = agenda.getRange(4+i,6).getValue();
-//      startTime = time.slice(0,time.length-3);
-//      scheduleRow = timeToRow(startTime);
-//      duration = 2;
-//      for (j=10; j<12;j++) {
-//        available = checkRoomAvailable(j+2,scheduleRow,duration);
-//        if (available) {
-//          takeRoom(j+2,scheduleRow,duration,student);
-//          roomFound = true;
-//          break;
-//        }
-//      }
-//      if (!roomFound) agenda.getRange(4+i, 8).setValue('No Room').setBackground('red');
-//      else agenda.getRange(4+i, 8).setValue(room.getRange(1,j+2).getValue());
-//    }
-//  }
   //Arrange PT rooms
   roomArrange(pt,false);
 }
