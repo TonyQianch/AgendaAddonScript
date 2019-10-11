@@ -1,0 +1,42 @@
+<html>
+  <head>
+    <title>Reminder Tool</title>
+    <style>
+      button {
+        background: blue;
+        border: none;
+        color: white;
+        text-align: center;
+        font-size: 16px;
+        border-radius: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <p><button id="clearList">Clear List</button></p>
+    <p><button id="getList">Get List</button></p>
+    <p><button id="sendReminder">Send Reminder</button></p>
+    <p><button id="reportDone">Report Status</button></p>
+  </body>
+</html>
+<script >
+ $(function(){
+ 
+   $('#clearList').click(function(){
+     google.script.run.clearList();
+   });
+   
+   $('#getList').click(function(){
+     google.script.run.getList();
+   });
+   
+   $('#sendReminder').click(function(){
+     google.script.run.sendReminder();
+   });
+   
+   $('#reportDone').click(function(){
+     google.script.run.reportDone();
+   });
+   
+ });
+</script>
