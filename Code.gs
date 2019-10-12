@@ -320,31 +320,48 @@ function roomArrange(sheet,counseling) {
     var roomCol = header[0].indexOf("Classroom")+1;
     var i, j, time, scheduleTime, student, roomFound, available;
     for (i=0; i<count; i++) {
-      roomFound = false;
-      student = sheet.getRange(2+i,studentCol).getValue();
-      time = sheet.getRange(2+i,timeCol).getValue();
-      scheduleTime = parseTime(time);
-      for (j=0; j<11;j++) {
-        if (counseling) {
-          available = checkRoomAvailable(13-j,scheduleTime[0],scheduleTime[1]);
-          if (available) {
-            takeRoom(13-j,scheduleTime[0],scheduleTime[1],student);
-            sheet.getRange(2+i, roomCol).setValue(room.getRange(1,13-j).getValue());
-            roomFound = true;
-            break;
+      if (sheet.getRange(2+i,roomCol).isBlank()){
+        roomFound = false;
+        student = sheet.getRange(2+i,studentCol).getValue();
+        time = sheet.getRange(2+i,timeCol).getValue();
+        scheduleTime = parseTime(time);
+        for (j=0; j<11;j++) {
+          if (counseling) {
+            available = checkRoomAvailable(12+j,scheduleTime[0],scheduleTime[1]);
+            if (available) {
+              takeRoom(12+j,scheduleTime[0],scheduleTime[1],student);
+              sheet.getRange(2+i, roomCol).setValue(room.getRange(1,12+j).getValue());
+              roomFound = true;
+              break;
+            }
+          }
+          else {
+            available = checkRoomAvailable(j+2,scheduleTime[0],scheduleTime[1]);
+            if (available) {
+              takeRoom(j+2,scheduleTime[0],scheduleTime[1],student);
+              sheet.getRange(2+i, roomCol).setValue(room.getRange(1,j+2).getValue());
+              roomFound = true;
+              break;
+            }
           }
         }
-        else {
-          available = checkRoomAvailable(j+2,scheduleTime[0],scheduleTime[1]);
-          if (available) {
-            takeRoom(j+2,scheduleTime[0],scheduleTime[1],student);
-            sheet.getRange(2+i, roomCol).setValue(room.getRange(1,j+2).getValue());
-            roomFound = true;
-            break;
-          }
-        }
+        if (!roomFound) sheet.getRange(2+i, roomCol).setValue('No Room').setBackground('red');
       }
-      if (!roomFound) sheet.getRange(2+i, roomCol).setValue('No Room').setBackground('red');
+    }
+  }
+}
+
+function getRyan() {
+  var cc = SpreadsheetApp.getActive().getSheetByName('CC');
+  var numRow = cc.getLastRow()-1;
+  var student, time, scheduleTime;
+  for (var i=0; i<numRow; i++) {
+    if (cc.getRange(2+i,6).getValue()=="Ryan") {
+      student = cc.getRange(2+i,4).getValue();
+      time = cc.getRange(2+i,5).getValue();
+      scheduleTime = parseTime(time);
+      takeRoom(13,scheduleTime[0],scheduleTime[1],student);
+      cc.getRange(2+i,10).setValue("Ryan");
     }
   }
 }
@@ -355,12 +372,14 @@ function finishAgenda() {
   var room = SpreadsheetApp.getActive().getSheetByName('Room');
   var agenda = SpreadsheetApp.getActive().getSheetByName('Agenda');
   room.getRange(2,2,27,12).clear();
-  agenda.getRange(4,1,agenda.getMaxRows()-4,8).clear();
-  agenda.getRange(4,1,agenda.getMaxRows()-4,8).setNumberFormat("@");
+  agenda.getRange(4,1,agenda.getLastRow()-4,8).clear();
+  agenda.getRange(4,1,agenda.getLastRow()-4,8).setNumberFormat("@");
   var date = agenda.getRange(1,1).getValue();
   //Arrange Classes
   arrangeClass(date);
   //Arrange CC rooms
+  cc.getRange(2,1,cc.getLastRow()-1,cc.getLastColumn()).sort(6);
+  getRyan();
   roomArrange(cc,true);
   //Arrange PT rooms
   roomArrange(pt,false);
