@@ -1,11 +1,23 @@
-/*function onOpen(){
-  SpreadsheetApp.getUi().createAddonMenu().addItem('Reminder Tool', 'showSidebar').addToUi();
+function onOpen(){
+//  SpreadsheetApp.getUi().createAddonMenu().addItem('Reminder Tool', 'showSidebar').addToUi();
+  promptBox();
 }
 
-function showSidebar() {
-  var html = HtmlService.createTemplateFromFile("reminderTool").evaluate().setTitle("Reminder Tool");
-  SpreadsheetApp.getUi().showSidebar(html);
-}*/
+//function showSidebar() {
+//  var html = HtmlService.createTemplateFromFile("reminderTool").evaluate().setTitle("Reminder Tool");
+//  SpreadsheetApp.getUi().showSidebar(html);
+//}
+
+function promptBox() {
+  var agenda = SpreadsheetApp.getActive().getSheetByName("Agenda");
+  var ui = SpreadsheetApp.getUi();
+  var prompt = ui.prompt("Date", "Please enter the date of the agenda (MM/DD/YYYY)", ui.ButtonSet.OK);
+  var response = prompt.getResponseText();
+  if (response.slice(2,3)=="/" && response.slice(5,6)=="/"&&response.length==10) {
+    agenda.getRange(1,1).setValue(response);
+  }
+  else promptBox();
+}
 
 function getNRow(sheet, startRow, startCol){
   var n = 0;
@@ -131,7 +143,6 @@ function studentReminderAddress(sheet,row) {
     }
     else address = '';
   }
-  Logger.log(address);
   return address;
 }
 
@@ -289,22 +300,17 @@ function findRoomCol(roomName) {
 
 function arrangeClass(date) {
   var day = dateToDay(date);
-  Logger.log(day);
   var class = SpreadsheetApp.getActive().getSheetByName('Class');
   var firstCol = class.getRange(1,1,class.getLastRow(),1).getValues().map(function(e){return e[0];});
   var row = firstCol.indexOf(day)+1;
-  Logger.log("Row #"+row);
   var numClass = class.getRange(row,2).getValue();
-  Logger.log("numClass: "+numClass);
   var className, time, roomName, teacher, schedule, roomCol;
   for (var i=0; i<numClass; i++) {
     className = class.getRange(row+1,2+i).getValue();
     time = class.getRange(row+2,2+i).getValue();
     roomName = class.getRange(row+3,2+i).getValue();
-    Logger.log(className+time+roomName);
     schedule = parseTime(time);
     roomCol = findRoomCol(roomName);
-    Logger.log(roomCol);
     takeRoom(roomCol,schedule[0],schedule[1],className);
   }
 }
