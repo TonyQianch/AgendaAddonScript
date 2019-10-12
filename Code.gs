@@ -42,13 +42,13 @@ function getEmailCol(sheet,startRow,endRow) {
 function clearPTList(){
   var PT = SpreadsheetApp.getActive().getSheetByName("PT");
   var numRow = PT.getLastRow()-1;
-  PT.getRange(2, 1, numRow, 8).clear();
-  PT.getRange(2,1,numRow,8).setNumberFormat("@");
+  PT.getRange(2, 1, numRow, PT.getLastColumn()).clear();
 }
 
 function completePTList(){
   var PT = SpreadsheetApp.getActive().getSheetByName("PT");
   var endRow = PT.getLastRow();
+  PT.getRange(2,1,endRow-1,8).setNumberFormat("@");
   getEmailCol(PT,2,endRow);
   for (var i=0; i<endRow-1; i++) {
     PT.getRange(2+i,7).setValue("Private Tutoring");
@@ -58,13 +58,13 @@ function completePTList(){
 function clearCCList(){
   var CC = SpreadsheetApp.getActive().getSheetByName("CC");
   var numRow = CC.getLastRow()-1;
-  CC.getRange(2, 1, numRow, 9).clear();
-  CC.getRange(2,1,numRow,8).setNumberFormat("@");
+  CC.getRange(2, 1, numRow, CC.getLastColumn()).clear();
 }
 
 function completeCCList(){
   var CC = SpreadsheetApp.getActive().getSheetByName("CC");
   var endRow = CC.getLastRow();
+  CC.getRange(2,1,endRow-1,8).setNumberFormat("@");
   getEmailCol(CC,2,endRow);
   for (var i=0; i<endRow-1; i++) {
     CC.getRange(2+i,7).setValue("Counseling Meeting");
