@@ -1,14 +1,20 @@
-function onOpen(){
+//function onOpen(){
 //  SpreadsheetApp.getUi().createAddonMenu().addItem('Reminder Tool', 'showSidebar').addToUi();
-  promptBox();
-}
+//  var prompt = SpreadsheetApp.getUi().prompt("Date", "Please enter the date of the agenda (MM/DD/YYYY)", ui.ButtonSet.OK);
+//  var response = prompt.getResponseText();
+//  var agenda = SpreadsheetApp.getActive().getSheetByName("Agenda");
+//  if (response.slice(2,3)=="/" && response.slice(5,6)=="/"&&response.length==10) {
+//    agenda.getRange(1,1).setValue(response);
+//  }
+//  else promptBox();
+//}
 
 //function showSidebar() {
 //  var html = HtmlService.createTemplateFromFile("reminderTool").evaluate().setTitle("Reminder Tool");
 //  SpreadsheetApp.getUi().showSidebar(html);
 //}
 
-function promptBox() {
+function promptDate() {
   var agenda = SpreadsheetApp.getActive().getSheetByName("Agenda");
   var ui = SpreadsheetApp.getUi();
   var prompt = ui.prompt("Date", "Please enter the date of the agenda (MM/DD/YYYY)", ui.ButtonSet.OK);
@@ -17,6 +23,13 @@ function promptBox() {
     agenda.getRange(1,1).setValue(response);
   }
   else promptBox();
+}
+
+function promptCheck(date) {
+  var ui = SpreadsheetApp.getUi();
+  var message = "Please confirm the date of the agenda: "+date;
+  var button = ui.alert("Confirm Date", message, ui.ButtonSet.YES_NO);
+  if (button == ui.Button.NO) {promptDate();}
 }
 
 function getNRow(sheet, startRow, startCol){
@@ -150,6 +163,7 @@ function sendPTReminder(){
   var PT = SpreadsheetApp.getActive().getSheetByName("PT");
   var address, student, time, withWho, meetingType;
   var date = SpreadsheetApp.getActive().getSheetByName("Agenda").getRange('A1').getValue();
+  promptCheck(date.toDateString());
   const startRow = 2;
   var numRow = getNRow(PT, startRow, 4);
   //send PT email
@@ -169,6 +183,7 @@ function sendCCReminder(){
   var CC = SpreadsheetApp.getActive().getSheetByName("CC");
   var address, student, time, withWho, meetingType;
   var date = SpreadsheetApp.getActive().getSheetByName("Agenda").getRange('A1').getValue();
+  promptCheck(date.toDateString());
   const startRow = 2;
   var numRow = getNRow(CC, startRow, 4);
   //send PT email
@@ -381,6 +396,7 @@ function finishAgenda() {
   agenda.getRange(4,1,agenda.getLastRow()-4,8).clear();
   agenda.getRange(4,1,agenda.getLastRow()-4,8).setNumberFormat("@");
   var date = agenda.getRange(1,1).getValue();
+  promptCheck(date.toDateString());
   //Arrange Classes
   arrangeClass(date);
   //Arrange CC rooms
