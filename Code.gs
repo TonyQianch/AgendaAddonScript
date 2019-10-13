@@ -380,6 +380,53 @@ function getRyan() {
   }
 }
 
+//function agendaPT() {
+//  var pt = SpreadsheetApp.getActive().getSheetByName('PT');
+//  var agenda = SpreadsheetApp.getActive().getSheetByName('Agenda');
+//  var student, time, withwho, classroom;
+//  student = pt.getRange('D2').getValue();
+//  time = pt.getRange('E2').getValue();
+//  withwho = pt.getRange('F2').getValue();
+//  classroom = pt.getRange('I2').getValue();
+//  var agendaInput = time+" "+student+" ("+withwho+") "+classroom;
+//  agenda.getRange('A4').setValue(agendaInput);
+//}
+
+function agendaFormat() {
+  var pt = SpreadsheetApp.getActive().getSheetByName('PT');
+  var cc = SpreadsheetApp.getActive().getSheetByName('CC');
+  var agenda = SpreadsheetApp.getActive().getSheetByName('Agenda');
+  var rowCounter,formula;
+  //set up agenda header
+  var header = [["Class","Private Tutor","Counseling Meeting","To Do","Initial Meeting"]];
+  agenda.getRange(3,1,1,5).setValues(header)
+                          .setHorizontalAlignment("center")
+                          .setFontLine("underline");
+  //populate all PT sessions by formula
+  rowCounter = pt.getLastRow()-1;
+  if (rowCounter > 0) {
+    formula = '=PT!$E2&" "&PT!$D2&" ("&PT!$F2&") "&PT!$I2';
+    agenda.getRange(4,2).setFormula(formula);
+    agenda.getRange(4,2).copyTo(agenda.getRange(4,2,rowCounter));
+  }
+  //populate all CC sessions by formula
+  rowCounter = cc.getLastRow()-1;
+  if (rowCounter > 0) {
+    formula = '=CC!$E2&" "&CC!$D2&" ("&CC!$F2&") "&CC!$I2';
+    agenda.getRange(4,3).setFormula(formula);
+    agenda.getRange(4,3).copyTo(agenda.getRange(4,3,rowCounter));
+  }
+  //set up column width and borders
+  agenda.getRange(2,1,agenda.getLastRow()-1,5).setBorder(true, true, true, true, true, false);
+  agenda.getRange(3,1,1,5).setBorder(true, true, true, true, true, true);
+  agenda.setColumnWidths(1, 5, 200);
+  agenda.autoResizeColumns(2,2);
+  var agendaTitle = agenda.getRange(1,1).getValue().toDateString()+"SM Daily Agenda";
+  agenda.getRange(2,1,1,5).merge().setValue(agendaTitle)
+                          .setHorizontalAlignment("center")
+                          .setFontSize(16);
+}
+
 function finishAgenda() {
   var pt = SpreadsheetApp.getActive().getSheetByName('PT');
   var cc = SpreadsheetApp.getActive().getSheetByName('CC');
@@ -398,6 +445,7 @@ function finishAgenda() {
   roomArrange(cc,true);
   //Arrange PT rooms
   roomArrange(pt,false);
+  agendaFormat();
 }
 
 
