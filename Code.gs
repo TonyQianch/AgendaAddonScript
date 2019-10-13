@@ -1,14 +1,7 @@
 //function onOpen(){
 //  SpreadsheetApp.getUi().createAddonMenu().addItem('Reminder Tool', 'showSidebar').addToUi();
-//  var prompt = SpreadsheetApp.getUi().prompt("Date", "Please enter the date of the agenda (MM/DD/YYYY)", ui.ButtonSet.OK);
-//  var response = prompt.getResponseText();
-//  var agenda = SpreadsheetApp.getActive().getSheetByName("Agenda");
-//  if (response.slice(2,3)=="/" && response.slice(5,6)=="/"&&response.length==10) {
-//    agenda.getRange(1,1).setValue(response);
-//  }
-//  else promptBox();
 //}
-
+//
 //function showSidebar() {
 //  var html = HtmlService.createTemplateFromFile("reminderTool").evaluate().setTitle("Reminder Tool");
 //  SpreadsheetApp.getUi().showSidebar(html);
