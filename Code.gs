@@ -380,17 +380,33 @@ function getRyan() {
   }
 }
 
-//function agendaPT() {
-//  var pt = SpreadsheetApp.getActive().getSheetByName('PT');
-//  var agenda = SpreadsheetApp.getActive().getSheetByName('Agenda');
-//  var student, time, withwho, classroom;
-//  student = pt.getRange('D2').getValue();
-//  time = pt.getRange('E2').getValue();
-//  withwho = pt.getRange('F2').getValue();
-//  classroom = pt.getRange('I2').getValue();
-//  var agendaInput = time+" "+student+" ("+withwho+") "+classroom;
-//  agenda.getRange('A4').setValue(agendaInput);
-//}
+function fetchClasses() {
+  var class = SpreadsheetApp.getActive().getSheetByName('Class');
+  var agenda = SpreadsheetApp.getActive().getSheetByName('Agenda');
+  var day = dateToDay(agenda.getRange(1,1).getValue());
+  //find correct section by date -> day
+  var firstCol = class.getRange(1,1,class.getLastRow(),1).getValues().map(function(e){return e[0];});
+  var row = firstCol.indexOf(day)+2;
+  var numClass = class.getRange(row-1,2).getValue();
+  var currentRow = 7;//row to be written in agenda
+  var value
+  if (day=="Saturday") currentRow = 4;
+  else {
+    value = [["Study Hall"],["3:00-7:00"]];
+    agenda.getRange(4,1,2,1).setValues(value);
+    agenda.getRange(4,1).setFontWeight('bold');
+  }
+  for (var i=0; i<numClass; i++) {
+    value = class.getRange(row,2+i).getValue();
+    agenda.getRange(currentRow,1).setValue(value)
+                                 .setFontWeight('bold')
+                                 .setFontLine('underline');
+    value = class.getRange(row+1,2+i).getValue()+" "+class.getRange(row+3,2+i).getValue();
+    agenda.getRange(currentRow+1,1).setValue(value);
+    agenda.getRange(currentRow+2,1).setValue(class.getRange(row+2,2+i).getValue());
+    currentRow += 4;
+  }
+}
 
 function agendaFormat() {
   var pt = SpreadsheetApp.getActive().getSheetByName('PT');
@@ -402,6 +418,8 @@ function agendaFormat() {
   agenda.getRange(3,1,1,5).setValues(header)
                           .setHorizontalAlignment("center")
                           .setFontLine("underline");
+  //populate all classes of the day
+  fetchClasses();
   //populate all PT sessions by formula
   rowCounter = pt.getLastRow()-1;
   if (rowCounter > 0) {
@@ -419,8 +437,8 @@ function agendaFormat() {
   //set up column width and borders
   agenda.getRange(2,1,agenda.getLastRow()-1,5).setBorder(true, true, true, true, true, false);
   agenda.getRange(3,1,1,5).setBorder(true, true, true, true, true, true);
-  agenda.setColumnWidths(1, 5, 200);
-  agenda.autoResizeColumns(2,2);
+  agenda.setColumnWidths(1, 5, 150);
+  agenda.autoResizeColumns(1,3);
   var agendaTitle = agenda.getRange(1,1).getValue().toDateString()+"SM Daily Agenda";
   agenda.getRange(2,1,1,5).merge().setValue(agendaTitle)
                           .setHorizontalAlignment("center")
@@ -433,8 +451,8 @@ function finishAgenda() {
   var room = SpreadsheetApp.getActive().getSheetByName('Room');
   var agenda = SpreadsheetApp.getActive().getSheetByName('Agenda');
   room.getRange(2,2,27,12).clear();
-  agenda.getRange(4,1,agenda.getLastRow()-4,8).clear();
-  agenda.getRange(4,1,agenda.getLastRow()-4,8).setNumberFormat("@");
+  agenda.getRange(2,1,agenda.getMaxRows()-1,5).clear();
+  agenda.getRange(2,1,agenda.getMaxRows()-1,5).setNumberFormat("@");
   var date = agenda.getRange(1,1).getValue();
   promptCheck(date.toDateString());
   //Arrange Classes
