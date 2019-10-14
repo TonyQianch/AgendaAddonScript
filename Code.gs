@@ -323,7 +323,41 @@ function arrangeClass(date) {
   }
 }
 
+function sortListbyTeacherClassCount() {
+  var pt = SpreadsheetApp.getActive().getSheetByName('PT');
+  var numRow = pt.getLastRow()-1;
+  var lr = pt.getRange(2,1,numRow,9);
+  lr.sort(6);
+  var teacherArray = pt.getRange(2,6,numRow,1).getValues();
+  Logger.log(teacherArray);
+  var i, j, count;
+  for (i=0; i<numRow-1; i++) {
+    count = 1;
+    Logger.log(teacherArray[i][0]);
+    for (j=i+1; j<numRow; j++) {
+      if (teacherArray[i][0] == teacherArray[j][0]) count++;
+      else break;
+    }
+    Logger.log(count);
+    for (j=i; j<i+count; j++) {
+      teacherArray[j][0] = count+teacherArray[j][0];
+    }
+    i += count-1;
+  }
+  if (j==numRow-1) {
+    teacherArray[numRow-1][0] = "1"+teacherArray[numRow-1][0];
+  }
+  pt.getRange(2,6,numRow,1).setValues(teacherArray);
+  lr.sort({column: 6, ascending: false});
+  Logger.log(pt.getRange(2,6,numRow,1).getValues());
+  for (i=0;i<numRow;i++) {
+    pt.getRange(2+i,6).setValue(pt.getRange(2+i,6).getValue().slice(1));
+  }
+  Logger.log(pt.getRange(2,6,numRow,1).getValues());
+}
+
 function roomArrange(sheet,counseling) {
+  //sheet = SpreadsheetApp.getActive().getSheetByName('PT');
   var room = SpreadsheetApp.getActive().getSheetByName('Room');
   var count = sheet.getLastRow()-1;
   if (count > 0) {
@@ -333,10 +367,11 @@ function roomArrange(sheet,counseling) {
     var withCol = header[0].indexOf("With")+1;
     var roomCol = header[0].indexOf("Classroom")+1;
     var i, j, time, scheduleTime, student, roomFound, available;
+    sheet.getRange(2,1,count,10).sort(6);
     for (i=0; i<count; i++) {
       if (sheet.getRange(2+i,roomCol).isBlank()){
         roomFound = false;
-        student = sheet.getRange(2+i,studentCol).getValue();
+        student = sheet.getRange(2+i,withCol).getValue();
         time = sheet.getRange(2+i,timeCol).getValue();
         scheduleTime = parseTime(time);
         for (j=0; j<11;j++) {
