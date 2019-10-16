@@ -7,6 +7,10 @@
   <body>
     <h1 style="text-align: center"><b>Agenda Workflow</b></h1>
     <p>Please follow the below process to complete agenda and send reminders.</p>
+    <br>
+    <p>1. Enter the date of this agenda</p>
+    <p><button class="green" id="date" onclick="google.script.run.promptDate();" width="100%">Enter Date</button></p>
+    <p>2. Enter all counseling appointments in these columns</p>
     <p><button class="green" id="clearList" onclick="google.script.run.clearPTList();" width="100%">Clear List</button></p>
     <p><button class="green" id="getList" onclick="google.script.run.completePTList();">Get List</button></p>
     <p><button class="green" id="sendReminder" onclick="google.script.run.sendPTReminder();">Send Reminder</button></p>

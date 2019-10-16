@@ -107,10 +107,10 @@ function sendEmail(address,subject,body) {
   MailApp.sendEmail({to: address, subject: subject, htmlBody: body, inlineImages: {sampleImage: img}});
 }
 
-function sendPTEmail(address,student,time,withWho,meetingType,date){
+function sendPTEmail(address,student,time,withWho,branch,date){
   var day = dateToDay(date);
   var subject = "[YSI] Private Tutoring Reminder -- "+student+" --"+date.toDateString()+"--"+time;
-  var body = "Dear "+student+", <br><br>This is a reminder that you have your "+meetingType+" session with <strong>"+withWho
+  var body = "Dear "+student+", <br><br>This is a reminder that you have your private tutoring session with <strong>"+withWho+" "+branch
            +" at "+time+" on "+date.toDateString()+"</strong>. <br><br>Please also note that only parents may reschedule or cancel a student's session "
            +" by calling or emailing AT LEAST ONE YSI BUSINESS DAY IN ADVANCE of the scheduled session. Parents who do not call "
            +"or email at least one business day in advance will still be charged the full rate as we are still required to pay "
@@ -118,10 +118,10 @@ function sendPTEmail(address,student,time,withWho,meetingType,date){
   sendEmail(address, subject, body);
 }
 
-function sendCCEmail(address,student,time,withWho,meetingType,date){
+function sendCCEmail(address,student,time,withWho,branch,date){
   var day = dateToDay(date);
   var subject = "[YSI] Counseling Meeting Reminder -- "+student+" --"+date.toDateString()+"--"+time;
-  var body = "Dear "+student+", <br><br>This is a reminder that you have your "+meetingType+" session with <strong>"+withWho
+  var body = "Dear "+student+", <br><br>This is a reminder that you have your counselling meeting session with <strong>"+withWho+" "+branch
            +" at "+time+" on "+date.toDateString()+"</strong>. <br><br>Please also note that only parents may reschedule or cancel a student's session "
            +" by calling or emailing AT LEAST ONE YSI BUSINESS DAY IN ADVANCE of the scheduled session. Parents who do not call "
            +"or email at least one business day in advance will still be charged the full rate as we are still required to pay "
@@ -152,9 +152,23 @@ function studentReminderAddress(sheet,row) {
   return address;
 }
 
+function getBranch(sheet,row) {
+  var branch;
+  if (sheet.getRange(row,7).isBlank()) {
+    branch = "at San Marino branch";
+  }
+  else if (sheet.getRange(row,7).getValue()=="Online") {
+    branch = "online";
+  }
+  else {
+    branch = "at Arcadia branch";
+  }
+  return branch;
+}
+
 function sendPTReminder(){
   var PT = SpreadsheetApp.getActive().getSheetByName("PT");
-  var address, student, time, withWho, meetingType;
+  var address, student, time, withWho, branch;
   var date = SpreadsheetApp.getActive().getSheetByName("Agenda").getRange('A1').getValue();
   promptCheck(date.toDateString());
   const startRow = 2;
@@ -165,8 +179,8 @@ function sendPTReminder(){
     student = PT.getRange(startRow+i, 4).getValue();
     time = PT.getRange(startRow+i, 5).getValue();
     withWho = PT.getRange(startRow+i, 6).getValue();
-    meetingType = PT.getRange(startRow+i, 7).getValue();
-    sendPTEmail(address,student,time,withWho,meetingType,date);
+    branch = getBranch(PT,startRow+i);
+    sendPTEmail(address,student,time,withWho,branch,date);
     PT.getRange(startRow+i, 8).setValue('Done');
     SpreadsheetApp.flush();
   }
@@ -174,7 +188,7 @@ function sendPTReminder(){
 
 function sendCCReminder(){
   var CC = SpreadsheetApp.getActive().getSheetByName("CC");
-  var address, student, time, withWho, meetingType;
+  var address, student, time, withWho, branch;
   var date = SpreadsheetApp.getActive().getSheetByName("Agenda").getRange('A1').getValue();
   promptCheck(date.toDateString());
   const startRow = 2;
@@ -185,8 +199,8 @@ function sendCCReminder(){
     student = CC.getRange(startRow+i, 4).getValue();
     time = CC.getRange(startRow+i, 5).getValue();
     withWho = CC.getRange(startRow+i, 6).getValue();
-    meetingType = CC.getRange(startRow+i, 7).getValue();
-    sendCCEmail(address,student,time,withWho,meetingType,date);
+    branch = getBranch(CC,startRow+i);
+    sendCCEmail(address,student,time,withWho,branch,date);
     CC.getRange(startRow+i, 9).setValue('Done');
     SpreadsheetApp.flush();
   }
