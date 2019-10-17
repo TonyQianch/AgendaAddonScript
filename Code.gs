@@ -68,9 +68,9 @@ function completePTList(){
   var endRow = PT.getLastRow();
   PT.getRange(2,1,endRow-1,8).setNumberFormat("@");
   getEmailCol(PT,2,endRow);
-  for (var i=0; i<endRow-1; i++) {
-    PT.getRange(2+i,7).setValue("Private Tutoring");
-  }
+//  for (var i=0; i<endRow-1; i++) {
+//    PT.getRange(2+i,7).setValue("Private Tutoring");
+//  }
 }
 
 function clearCCList(){
@@ -84,9 +84,9 @@ function completeCCList(){
   var endRow = CC.getLastRow();
   CC.getRange(2,1,endRow-1,8).setNumberFormat("@");
   getEmailCol(CC,2,endRow);
-  for (var i=0; i<endRow-1; i++) {
-    CC.getRange(2+i,7).setValue("Counseling Meeting");
-  }
+//  for (var i=0; i<endRow-1; i++) {
+//    CC.getRange(2+i,7).setValue("Counseling Meeting");
+//  }
 }
 
 function dateToDay(date) {
@@ -195,6 +195,7 @@ function sendCCReminder(){
   var numRow = getNRow(CC, startRow, 4);
   //send PT email
   for (var i=0; i<numRow; i++) {
+    if (CC.getRange(startRow+i, 9).isBlank) {
     address = studentReminderAddress(CC,startRow+i)+','+CC.getRange(startRow+i,8).getValue();
     student = CC.getRange(startRow+i, 4).getValue();
     time = CC.getRange(startRow+i, 5).getValue();
@@ -203,13 +204,14 @@ function sendCCReminder(){
     sendCCEmail(address,student,time,withWho,branch,date);
     CC.getRange(startRow+i, 9).setValue('Done');
     SpreadsheetApp.flush();
+    }
   }
 }
 
 function ptTable() {
   var PT = SpreadsheetApp.getActive().getSheetByName("PT");
   var numRow = PT.getLastRow();
-  var data = PT.getRange(1,1,numRow,8).getValues();
+  var data = PT.getRange(1,4,numRow,5).getValues();
   var row, col;
   var TABLEFORMAT = 'cellspacing="2" cellpadding="2" dir="ltr" border="1" style="width:100%;table-layout:fixed;font-size:10pt;font-family:arial,sans,sans-serif;border-collapse:collapse;border:1px solid #ccc;font-weight:normal;color:black;background-color:white;text-align:center;text-decoration:none;font-style:normal;'
   var pttable = '<table ' + TABLEFORMAT +' ">';
@@ -231,7 +233,7 @@ function ptTable() {
 function ccTable() {
   var CC = SpreadsheetApp.getActive().getSheetByName("CC");
   var numRow = CC.getLastRow();
-  var data = CC.getRange(1,1,numRow,9).getValues();
+  var data = CC.getRange(1,4,numRow,6).getValues();
   var row, col;
   var TABLEFORMAT = 'cellspacing="2" cellpadding="2" dir="ltr" border="1" style="width:100%;table-layout:fixed;font-size:10pt;font-family:arial,sans,sans-serif;border-collapse:collapse;border:1px solid #ccc;font-weight:normal;color:black;background-color:white;text-align:center;text-decoration:none;font-style:normal;'
   var cctable = '<table ' + TABLEFORMAT +' ">';
@@ -252,9 +254,9 @@ function ccTable() {
 
 function reportDone(){
   var date = SpreadsheetApp.getActive().getSheetByName("Agenda").getRange('A1').getValue();
-//  var management = "amywang.ysi@gmail.com,crystallam.ysi@gmail.com,elimzheng.ysi@gmail.com,karenlee1.ysi@gmail.com,"
-//                 +"lanyao.ysi@gmail.com,rileyliu.ysi@gmail.com,steveparkmail@gmail.com,yanjunlysi@gmail.com,ysprep@gmail.com";
-  var testemail = "tonyqianchenhao@gmail.com";
+  var management = "amywang.ysi@gmail.com,crystallam.ysi@gmail.com,elimzheng.ysi@gmail.com,karenlee1.ysi@gmail.com,"
+                 +"lanyao.ysi@gmail.com,rileyliu.ysi@gmail.com,steveparkmail@gmail.com,yanjunlysi@gmail.com,ysprep@gmail.com";
+//  var testemail = "tonyqianchenhao@gmail.com";
   var subject = date+" PT and Counseling Reminder Status";
   var message = "The reminders emails for "+date+" has been sent. Please check the table below. Thank you!";
   var pttable = ptTable();
@@ -370,6 +372,14 @@ function sortListbyTeacherClassCount() {
   Logger.log(pt.getRange(2,6,numRow,1).getValues());
 }
 
+function settleArcadia (sheet,count,roomCol) {
+  for (var i=0; i<count; i++) {
+    if (sheet.getRange(2+i,7).getValue() == "Arcadia") {
+      sheet.getRange(2+i,roomCol).setValue("ARC");
+    }
+  }
+}
+
 function roomArrange(sheet,counseling) {
   //sheet = SpreadsheetApp.getActive().getSheetByName('PT');
   var room = SpreadsheetApp.getActive().getSheetByName('Room');
@@ -380,8 +390,8 @@ function roomArrange(sheet,counseling) {
     var timeCol = header[0].indexOf("Time")+1;
     var withCol = header[0].indexOf("With")+1;
     var roomCol = header[0].indexOf("Classroom")+1;
+    settleArcadia(sheet,count,roomCol);
     var i, j, time, scheduleTime, student, roomFound, available;
-    sheet.getRange(2,1,count,10).sort(6);
     for (i=0; i<count; i++) {
       if (sheet.getRange(2+i,roomCol).isBlank()){
         roomFound = false;
@@ -420,11 +430,16 @@ function getRyan() {
   var student, time, scheduleTime;
   for (var i=0; i<numRow; i++) {
     if (cc.getRange(2+i,6).getValue()=="Ryan") {
-      student = cc.getRange(2+i,4).getValue();
-      time = cc.getRange(2+i,5).getValue();
-      scheduleTime = parseTime(time);
-      takeRoom(13,scheduleTime[0],scheduleTime[1],student);
-      cc.getRange(2+i,10).setValue("Ryan");
+      if (cc.getRange(2+i,7).getValue()=="Arcadia") {
+        cc.getRange(2+i,10).setValue("ARC");
+      }
+      else {
+        student = cc.getRange(2+i,4).getValue();
+        time = cc.getRange(2+i,5).getValue();
+        scheduleTime = parseTime(time);
+        takeRoom(13,scheduleTime[0],scheduleTime[1],student);
+        cc.getRange(2+i,10).setValue("Ryan");
+      }
     }
   }
 }
@@ -479,7 +494,7 @@ function agendaFormat() {
   //populate all CC sessions by formula
   rowCounter = cc.getLastRow()-1;
   if (rowCounter > 0) {
-    formula = '=CC!$E2&" "&CC!$D2&" ("&CC!$F2&") "&CC!$I2';
+    formula = '=CC!$E2&" "&CC!$D2&" ("&CC!$F2&") "&CC!$J2';
     agenda.getRange(4,3).setFormula(formula);
     agenda.getRange(4,3).copyTo(agenda.getRange(4,3,rowCounter));
   }
@@ -505,6 +520,7 @@ function finishAgenda() {
   var date = agenda.getRange(1,1).getValue();
   promptCheck(date.toDateString());
   //Arrange Classes
+  sortListbyTeacherClassCount();
   arrangeClass(date);
   //Arrange CC rooms
   cc.getRange(2,1,cc.getLastRow()-1,cc.getLastColumn()).sort(6);
