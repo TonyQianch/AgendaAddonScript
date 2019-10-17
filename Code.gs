@@ -472,6 +472,31 @@ function fetchClasses() {
   }
 }
 
+function ptAgenda() {
+  var pt = SpreadsheetApp.getActive().getSheetByName('PT');
+  var agenda = SpreadsheetApp.getActive().getSheetByName('Agenda');
+  var sanMarino = [], other = [];
+  var time, student, teacher, room, agendaItem;
+  for (var i=0; i<pt.getLastRow()-1; i++) {
+    time = pt.getRange(i+2,5).getValue();
+    student = pt.getRange(i+2,4).getValue();
+    teacher = pt.getRange(i+2,6).getValue();
+    room = pt.getRange(i+2,9).getValue();
+    agendaItem = time+" "+student+" ("+teacher+") "+room;
+    if (pt.getRange(i+2,7).isBlank()) {
+      sanMarino.push([agendaItem]);
+    }
+    else other.push([agendaItem]);
+  }
+  if (sanMarino.length>0) agenda.getRange(4,2,sanMarino.length,1).setValues(sanMarino);
+  if (other.length>0) {
+    agenda.getRange(4+sanMarino.length,2).setValue("Arcadia/Online")
+                                         .setFontLine("underline")
+                                         .setFontWeight("bold");
+    agenda.getRange(4+sanMarino.length+1,2,other.length,1).setValues(other);
+  }
+}
+
 function agendaFormat() {
   var pt = SpreadsheetApp.getActive().getSheetByName('PT');
   var cc = SpreadsheetApp.getActive().getSheetByName('CC');
@@ -487,9 +512,10 @@ function agendaFormat() {
   //populate all PT sessions by formula
   rowCounter = pt.getLastRow()-1;
   if (rowCounter > 0) {
-    formula = '=PT!$E2&" "&PT!$D2&" ("&PT!$F2&") "&PT!$I2';
-    agenda.getRange(4,2).setFormula(formula);
-    agenda.getRange(4,2).copyTo(agenda.getRange(4,2,rowCounter));
+    ptAgenda();
+//    formula = '=PT!$E2&" "&PT!$D2&" ("&PT!$F2&") "&PT!$I2';
+//    agenda.getRange(4,2).setFormula(formula);
+//    agenda.getRange(4,2).copyTo(agenda.getRange(4,2,rowCounter));
   }
   //populate all CC sessions by formula
   rowCounter = cc.getLastRow()-1;
