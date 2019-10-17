@@ -497,10 +497,17 @@ function ptAgenda() {
   }
 }
 
+function dateFormat(date) {
+  var month = date.getMonth()+1;
+  var day = date.getDate();
+  return month+"/"+day;
+}
+
 function agendaFormat() {
   var pt = SpreadsheetApp.getActive().getSheetByName('PT');
   var cc = SpreadsheetApp.getActive().getSheetByName('CC');
   var agenda = SpreadsheetApp.getActive().getSheetByName('Agenda');
+  var date = agenda.getRange(1,1).getValue();
   var rowCounter,formula;
   //set up agenda header
   var header = [["Class","Private Tutor","Counseling Meeting","To Do","Initial Meeting"]];
@@ -529,7 +536,7 @@ function agendaFormat() {
   agenda.getRange(3,1,1,5).setBorder(true, true, true, true, true, true);
   agenda.setColumnWidths(1, 5, 150);
   agenda.autoResizeColumns(1,3);
-  var agendaTitle = agenda.getRange(1,1).getValue().toDateString()+"SM Daily Agenda";
+  var agendaTitle = "SM Daily Agenda "+dateFormat(date)+" "+dateToDay(date);
   agenda.getRange(2,1,1,5).merge().setValue(agendaTitle)
                           .setHorizontalAlignment("center")
                           .setFontSize(16);
