@@ -262,7 +262,7 @@ function reportDone(){
   var pttable = ptTable();
   var cctable = ccTable();
   var body = message+'<BR><BR>'+pttable+'<BR><BR>'+cctable+'<BR><BR>';
-  sendEmail(testemail,subject,body);
+  sendEmail(management,subject,body);
 }
 
 
