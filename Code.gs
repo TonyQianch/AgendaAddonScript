@@ -342,7 +342,7 @@ function arrangeClass(date) {
 function sortListbyTeacherClassCount() {
   var pt = SpreadsheetApp.getActive().getSheetByName('PT');
   var numRow = pt.getLastRow()-1;
-  var lr = pt.getRange(2,1,numRow,9);
+  var lr = pt.getRange(2,1,numRow,10);
   lr.sort(6);
   var teacherArray = pt.getRange(2,6,numRow,1).getValues();
   Logger.log(teacherArray);
@@ -370,6 +370,13 @@ function sortListbyTeacherClassCount() {
     pt.getRange(2+i,6).setValue(pt.getRange(2+i,6).getValue().slice(1));
   }
   Logger.log(pt.getRange(2,6,numRow,1).getValues());
+}
+
+function recordOriginalOrder() {
+  var pt = SpreadsheetApp.getActive().getSheetByName('PT');
+  var numRow = pt.getLastRow()-1;
+  for (var i=0; i<numRow; i++) pt.getRange(i+2,10).setValue(i+1);
+  //pt.hideColumns(10);
 }
 
 function settleArcadia (sheet,count,roomCol) {
@@ -520,9 +527,6 @@ function agendaFormat() {
   rowCounter = pt.getLastRow()-1;
   if (rowCounter > 0) {
     ptAgenda();
-//    formula = '=PT!$E2&" "&PT!$D2&" ("&PT!$F2&") "&PT!$I2';
-//    agenda.getRange(4,2).setFormula(formula);
-//    agenda.getRange(4,2).copyTo(agenda.getRange(4,2,rowCounter));
   }
   //populate all CC sessions by formula
   rowCounter = cc.getLastRow()-1;
@@ -553,14 +557,17 @@ function finishAgenda() {
   var date = agenda.getRange(1,1).getValue();
   promptCheck(date.toDateString());
   //Arrange Classes
-  sortListbyTeacherClassCount();
   arrangeClass(date);
   //Arrange CC rooms
   cc.getRange(2,1,cc.getLastRow()-1,cc.getLastColumn()).sort(6);
   getRyan();
   roomArrange(cc,true);
   //Arrange PT rooms
+  recordOriginalOrder();
+  sortListbyTeacherClassCount(); //to avoid teachers with more classes changing rooms
   roomArrange(pt,false);
+  pt.getRange(2,1,pt.getLastRow()-1,10).sort(10); //sort by time for easy viewing in agenda
+  pt.deleteColumn(10);//delete order recording column
   agendaFormat();
 }
 
