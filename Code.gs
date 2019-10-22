@@ -571,7 +571,16 @@ function finishAgenda() {
   agendaFormat();
 }
 
-
+function agendaToHistory() {
+  var agenda = SpreadsheetApp.getActive().getSheetByName('Agenda');
+  var date = agenda.getRange(1,1).getValue();
+  var day = dateToDay(date);
+  var historySheet = SpreadsheetApp.getActive().getSheetByName(day);
+  var numRow = agenda.getLastRow()-1;
+  historySheet.getRange(1,1,historySheet.getMaxRows(),5).clear();
+  agenda.getRange(2,1,numRow,5).copyTo(historySheet.getRange(1,1));
+  agenda.getRange(2,1,numRow,5).copyTo(historySheet.getRange(1,1),SpreadsheetApp.CopyPasteType.PASTE_COLUMN_WIDTHS,false);
+}
 
 
 
