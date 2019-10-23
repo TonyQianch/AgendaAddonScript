@@ -582,6 +582,36 @@ function agendaToHistory() {
   agenda.getRange(2,1,numRow,5).copyTo(historySheet.getRange(1,1),SpreadsheetApp.CopyPasteType.PASTE_COLUMN_WIDTHS,false);
 }
 
+function ptFromPast() {
+  var pt = SpreadsheetApp.getActive().getSheetByName('PT');
+  var date = SpreadsheetApp.getActive().getSheetByName('Agenda').getRange(1,1).getValue();
+  var past = SpreadsheetApp.getActive().getSheetByName(dateToDay(date));
+  var sanMarino=true, numRow=past.getLastRow()-2;
+  var fullString, subStr, time, student, teacher, room;
+  for (var i=0; i<numRow; i++) {
+    fullString = past.getRange(3+i,2).getValue();
+    if (fullString == 'Arcadia/Online') sanMarino = false;
+    else {
+      subStr = fullString.split("(");
+      time = subStr[0].slice(0,subStr[0].indexOf(" "));
+      student = subStr[0].slice(subStr[0].indexOf(" ")+1,subStr[0].length-1);
+      teacher = subStr[1].slice(0,subStr[1].indexOf(")"));
+      room = subStr[1].slice(subStr[1].indexOf(")")+2);
+      if (sanMarino) {
+        pt.getRange(i+2,4).setValue(student);
+        pt.getRange(i+2,5).setValue(time);
+        pt.getRange(i+2,6).setValue(teacher);
+      }
+      else {
+        pt.getRange(i+1,4).setValue(student);
+        pt.getRange(i+1,5).setValue(time);
+        pt.getRange(i+1,6).setValue(teacher);
+        room = (room == "ARC")?"Arcadia":"Online";
+        pt.getRange(i+1,7).setValue(room);
+      }
+    }
+  }
+}
 
 
 
