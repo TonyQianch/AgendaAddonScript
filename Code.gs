@@ -39,24 +39,6 @@ function getNRow(sheet, startRow, startCol){
   }
 }
 
-function getEmailCol(sheet,startRow,endRow) {
-  var emailList = SpreadsheetApp.getActive().getSheetByName("EmailList");
-  var numRow = emailList.getLastRow()-1;
-  var data = emailList.getRange(2,1,numRow,4).getValues();
-  var i, studentName;
-  for (var row=startRow; row<endRow+1; row++) {
-    studentName = sheet.getRange(row,4).getValue();
-    for ( i=0; i<numRow; i++) {
-      if (data[i][0]==studentName) {
-        sheet.getRange(row,1).setValue(data[i][1]);
-        sheet.getRange(row,2).setValue(data[i][2]);
-        sheet.getRange(row,3).setValue(data[i][3]);
-        break;
-      }
-    }
-  }
-}
-
 function clearPTList(){
   var PT = SpreadsheetApp.getActive().getSheetByName("PT");
   var numRow = PT.getLastRow()-1;
@@ -65,12 +47,13 @@ function clearPTList(){
 
 function completePTList(){
   var PT = SpreadsheetApp.getActive().getSheetByName("PT");
-  var endRow = PT.getLastRow();
-  PT.getRange(2,1,endRow-1,8).setNumberFormat("@");
-  getEmailCol(PT,2,endRow);
-//  for (var i=0; i<endRow-1; i++) {
-//    PT.getRange(2+i,7).setValue("Private Tutoring");
-//  }
+  var numRow = PT.getLastRow()-1;
+  PT.getRange(2,1,numRow,8).setNumberFormat("@");
+  var emailMatchFormulas = ['=IFNA(INDEX(EmailList!$B:$B,MATCH($D2,EmailList!$A:$A,0)),"")',
+                            '=IFNA(INDEX(EmailList!$C:$C,MATCH($D2,EmailList!$A:$A,0)),"")',
+                            '=IFNA(INDEX(EmailList!$D:$D,MATCH($D2,EmailList!$A:$A,0)),"")'];
+  PT.getRange(2,1,1,3).setFormulas([emailMatchFormulas]);
+  PT.getRange(2,1,1,3).copyTo(PT.getRange(2,1,numRow,3));
 }
 
 function clearCCList(){
@@ -81,12 +64,13 @@ function clearCCList(){
 
 function completeCCList(){
   var CC = SpreadsheetApp.getActive().getSheetByName("CC");
-  var endRow = CC.getLastRow();
-  CC.getRange(2,1,endRow-1,8).setNumberFormat("@");
-  getEmailCol(CC,2,endRow);
-//  for (var i=0; i<endRow-1; i++) {
-//    CC.getRange(2+i,7).setValue("Counseling Meeting");
-//  }
+  var numRow = CC.getLastRow()-1;
+  CC.getRange(2,1,numRow,8).setNumberFormat("@");
+  var emailMatchFormulas = ['=IFNA(INDEX(EmailList!$B:$B,MATCH($D2,EmailList!$A:$A,0)),"")',
+                            '=IFNA(INDEX(EmailList!$C:$C,MATCH($D2,EmailList!$A:$A,0)),"")',
+                            '=IFNA(INDEX(EmailList!$D:$D,MATCH($D2,EmailList!$A:$A,0)),"")'];
+  CC.getRange(2,1,1,3).setFormulas([emailMatchFormulas]);
+  CC.getRange(2,1,1,3).copyTo(CC.getRange(2,1,numRow,3));
 }
 
 function dateToDay(date) {
