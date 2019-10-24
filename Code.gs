@@ -597,7 +597,19 @@ function ptFromPast() {
   }
 }
 
-
+// function to check if there is student without email in a sheet
+function verifyEmail(sheet) {
+  sheet = SpreadsheetApp.getActive().getSheetByName("PT");
+  var numRow = sheet.getLastRow()-1;
+  var missing = false;
+  for (var i=0; i<numRow; i++) {
+    if (sheet.getRange(i+2,1).isBlank() && sheet.getRange(i+2,2).isBlank() && sheet.getRange(i+2,3).isBlank()) {
+      sheet.getRange(i+2,1,1,9).setBackground("yellow");
+      missing = true;
+    }
+  }
+  return missing;
+}
 
 
 
