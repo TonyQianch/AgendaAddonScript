@@ -153,8 +153,8 @@ function getBranch(sheet,row) {
 function sendPTReminder(){
   var PT = SpreadsheetApp.getActive().getSheetByName("PT");
   var address, student, time, withWho, branch;
-  var date = SpreadsheetApp.getActive().getSheetByName("Agenda").getRange('A1').getValue();
   promptCheck(date.toDateString());
+  var date = SpreadsheetApp.getActive().getSheetByName("Agenda").getRange('A1').getValue();
   const startRow = 2;
   var numRow = getNRow(PT, startRow, 4);
   //send PT email
@@ -622,7 +622,7 @@ function showManualColumn(sheet) {
 }
 
 //function to activate a sheet with proper sideBar
-function activateSheet(sheet) {}
+function activateSheet(sheetName) {}
 
 //***function to confirm date input and decide next action
 //1. If date is in the past, pop to re-enter
