@@ -1,11 +1,20 @@
-<!DOCTYPE html>
+<link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons.css">
+
 <html>
   <head>
-    <base target="_top">
+    <title>Enter PT List</title>
   </head>
   <body>
-    
+    <h1>Private Tutoring List</h1>
+    <p>Please enter the private tutoring list in the given columns.</p>
+    <br>
+    <h3>If you want to start with last week's list, click the button below.</h1>
+    <p><button class="green" id="ptFromPast" onclick="google.script.run.ptFromPast();" width="100%">Get List</button></p>
+    <br>
+    <h3>Once you have finished, click the button below.</h1>
+    <p><button class="green" id="confirmList" onclick="google.script.run.ptFromPast();" width="100%">Confirm</button></p>
   </body>
 </html>
 
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"> </script>
 

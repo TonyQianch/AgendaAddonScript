@@ -1,11 +1,11 @@
 //function onOpen(){
 //  SpreadsheetApp.getUi().createAddonMenu().addItem('Reminder Tool', 'showSidebar').addToUi();
 //}
-//
-//function showSidebar() {
-//  var html = HtmlService.createTemplateFromFile("reminderTool").evaluate().setTitle("Reminder Tool");
-//  SpreadsheetApp.getUi().showSidebar(html);
-//}
+
+function showSidebar(sidebarName) {
+  var html = HtmlService.createTemplateFromFile(sidebarName).evaluate().setTitle(sidebarName);
+  SpreadsheetApp.getUi().showSidebar(html);
+}
 
 function promptDate() {
   var agenda = SpreadsheetApp.getActive().getSheetByName("Agenda");
@@ -599,7 +599,7 @@ function ptFromPast() {
 
 // function to check if there is student without email in a sheet
 function verifyEmail(sheet) {
-  sheet = SpreadsheetApp.getActive().getSheetByName("PT");
+  //sheet = SpreadsheetApp.getActive().getSheetByName("PT");
   var numRow = sheet.getLastRow()-1;
   var missing = false;
   for (var i=0; i<numRow; i++) {
@@ -610,6 +610,61 @@ function verifyEmail(sheet) {
   }
   return missing;
 }
+
+//function to present columns to be manually filled
+function showManualColumn(sheet) {
+  sheet = SpreadsheetApp.getActive().getSheetByName("PT");
+  var sheetName = sheet.getSheetName();
+  var sidebarName = "enter"+sheetName+"List";
+  sheet.hideColumns(8,3);
+  sheet.hideColumns(1,3);
+  showSidebar(sidebarName);
+}
+
+//function to activate a sheet with proper sideBar
+function activateSheet(sheet) {}
+
+//***function to confirm date input and decide next action
+//1. If date is in the past, pop to re-enter
+//2. If date is the today/next day, pull up agenda
+//3. Otherwise, jump to confirm classes
+function confirmDate() {}
+
+//***function to confirm classes
+//Once confirmed, jump to enter CC list
+function confirmClass() {}
+
+//***function to check CC email and decide next action
+//1. If all emails are found, send reminders and proceed to PT
+//2. If there is missing email, pop error sidebar
+function confirmCC() {}
+
+//***function to check PT email and decide next action
+//1. If all emails are found, send reminders and proceed to create agenda
+//2. If there is missing email, pop error sidebar
+function confirmPT() {}
+
+//***function to confirm agenda
+//1. Overwrite the agenda a week ago
+//2. Clear information
+function confirmAgenda() {}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
